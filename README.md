@@ -1,2 +1,2 @@
 # SwiftMessageReader
-Console application which can read Swift MT799 messages and write the information on to SQLite DB.
+Web application which can read Swift MT799 messages and write the information on to SQLite DB.

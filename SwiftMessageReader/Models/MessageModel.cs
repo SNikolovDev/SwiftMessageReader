@@ -1,6 +1,6 @@
 ﻿namespace SwiftMessageReader.Models
 {
-    public class Message
+    public class MessageModel
     {
         // {1:F01PRCBBGSFAXXX1111111111}
         // F01 - type of senders reference;
@@ -10,7 +10,10 @@
         public string SendersBankIdentifierCode { get; set; }
 
         // {2:O7991111111111ABGRSWACAXXX11111111111111111111N}
-        // O799 - message type; 1111111111 - sender's unique reference number; ABGRSWACAXXX - receiver's BIC; 11111111111111111111 - additional info/ transaction reference number; N - priority (Normal);
+        // O799 - message type; 1111111111 - sender's unique reference number;
+        // ABGRSWACAXXX - receiver's BIC;
+        // 11111111111111111111 - additional info/ transaction reference number;
+        // N - priority (Normal);
         public int ApplicationHeaderBlock { get; set; }
         public string MessageReferenceNumber { get; set; }
 
@@ -40,6 +43,5 @@
         // {CHK:111111111111}
         public int CheckValue { get; set; }
         // } closing tag 5
-
     }
 }

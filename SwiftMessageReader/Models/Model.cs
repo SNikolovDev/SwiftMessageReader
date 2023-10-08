@@ -1,6 +1,6 @@
 ﻿namespace SwiftMessageReader.Models
 {
-    public class Model
+    public class SwiftModel
     {
         public string Name { get; set; }
 

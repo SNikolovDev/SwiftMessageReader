@@ -17,7 +17,7 @@ namespace SwiftMessageReader.Data
             connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public void InsertIntoDatabase(Model model)
+        public void InsertIntoDatabase(MessageModel model)
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
@@ -28,8 +28,8 @@ namespace SwiftMessageReader.Data
                 command.CommandText = "INSERT INTO MyTable (Name, Age) VALUES (@Name, @Age)";
 
                 // Define parameters for the values to be inserted
-                command.Parameters.AddWithValue("@Name", model.Name);
-                command.Parameters.AddWithValue("@Age", model.Age);
+                //command.Parameters.AddWithValue("@Name", model.Name);
+                //command.Parameters.AddWithValue("@Age", model.Age);
 
                 //var insertCommant = InsertIntoTable(model, connection);
                 //insertCommant.ExecuteNonQuery();
@@ -40,19 +40,19 @@ namespace SwiftMessageReader.Data
             }
         }
 
-        private SQLiteCommand InsertIntoTable(Model model, SQLiteConnection connection)
-        {
-            using (SQLiteCommand command = new SQLiteCommand(connection))
-            {
-                // Define the SQL command to insert a new record into the 'Person' table
-                command.CommandText = "INSERT INTO SecondTable (Name, Age) VALUES (@Name, @Age)";
+        //private SQLiteCommand InsertIntoTable(MessageModel model, SQLiteConnection connection)
+        //{
+        //    using (SQLiteCommand command = new SQLiteCommand(connection))
+        //    {
+        //        // Define the SQL command to insert a new record into the 'Person' table
+        //        command.CommandText = "INSERT INTO SecondTable (Name, Age) VALUES (@Name, @Age)";
 
-                // Define parameters for the values to be inserted
-                command.Parameters.AddWithValue("@Name", model.Name);
-                command.Parameters.AddWithValue("@Age", model.Age);
+        //        // Define parameters for the values to be inserted
+        //        //command.Parameters.AddWithValue("@Name", model.Name);
+        //        //command.Parameters.AddWithValue("@Age", model.Age);
 
-                return command;
-            }         
-        }
+        //        return command;
+        //    }         
+        //}
     }
 }

@@ -1,4 +1,5 @@
 ﻿using SwiftMessageReader.Data;
+using SwiftMessageReader.Helpers;
 using SwiftMessageReader.Models;
 
 namespace SwiftMessageReader.Services
@@ -15,16 +16,19 @@ namespace SwiftMessageReader.Services
         
         public void ManageFile(IFormFile file)
         {
-            var text = FileToStringConverter.ConvertIFormFileToString(file);
+            var text = FileToStringConverter.ConvertIFormFileToString(file).ToString();
             //using (var reader = new StreamReader(file.OpenReadStream()))
             //{
             //    text = reader.ReadToEnd();
             //}
 
-            var model = new Model();
-            var splitedText = text.Split(' ').ToArray();
-            model.Name = splitedText[0];
-            model.Age = int.Parse(splitedText[1]);
+            var model = new MessageModel();
+            StringToDictionaryConverter.ConvertToDictionary(text);
+
+
+
+            ;
+         
 
             repository.InsertIntoDatabase(model);
         }

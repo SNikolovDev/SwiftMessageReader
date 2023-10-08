@@ -2,6 +2,8 @@
 {
     public class MessageModel
     {
+        public DateTime CreatedOn { get; set; }
+
         // {1:F01PRCBBGSFAXXX1111111111}
         // F01 - type of senders reference;
         // (PRCB - bank code; BG - country code; SF - location code; AXXX - branch code) - BIC;
@@ -26,7 +28,7 @@
 
         // :21:30-111-1111111
         public int FieldTag2 { get; set; } // "21" - reference assined by the sender
-        public string RelatedReferance { get; set; }
+        public string ReferenceAssinedByTheSender { get; set; }
 
         // :79:NA VNIMANIETO NA: OTDEL BANKOVI GARANTSII
         public int FieldTag4 { get; set; } // "79" - free format message
@@ -35,13 +37,13 @@
         // -} closing tag 4
 
         //{5:
-        public int TrailerHeaderBlock { get; set; }
+        public string TrailerHeaderBlock { get; set; }
 
         // {MAC:00000000}
-        public int MessageAuthenticationCode { get; set; }
+        public string MessageAuthenticationCode { get; set; }
 
         // {CHK:111111111111}
-        public int CheckValue { get; set; }
+        public string CheckValue { get; set; }
         // } closing tag 5
     }
 }

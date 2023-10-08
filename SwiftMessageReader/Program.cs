@@ -1,6 +1,9 @@
 using NLog.Web;
+
 using SwiftMessageReader.Data;
+using SwiftMessageReader.Data.Interfaces;
 using SwiftMessageReader.Services;
+using SwiftMessageReader.Services.Interfaces;
 
 namespace SwiftMessageReader
 {
@@ -8,15 +11,8 @@ namespace SwiftMessageReader
     {
         public static void Main(string[] args)
         {
-            // Setting up logger
-            //var logger = LogManager.Setup()
-            //    .LoadConfigurationFromAppSettings()
-            //    .GetCurrentClassLogger();
-
-            //logger.Debug("init main");
-
             var builder = WebApplication
-                .CreateBuilder(args);
+            .CreateBuilder(args);
 
             // Add services to the container.
             builder.Services.AddScoped<ISwiftService, SwiftService>();
@@ -27,7 +23,7 @@ namespace SwiftMessageReader
             builder.Host.UseNLog();
 
             builder.Services.AddControllers();
-      
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -42,8 +38,8 @@ namespace SwiftMessageReader
 
             app.MapControllers();
 
-            var databaseInitializer = new DataBaseCreater(builder.Configuration);
-            databaseInitializer.Create();
+            var databaseCreator = new DataBaseCreator(builder.Configuration);
+            databaseCreator.Create();
 
             app.Run();
         }

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 using SwiftMessageReader.Helpers;
-using SwiftMessageReader.Services;
+using SwiftMessageReader.Services.Interfaces;
 
 namespace SwiftReader.Controllers
 {

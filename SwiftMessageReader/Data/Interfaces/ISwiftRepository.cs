@@ -1,6 +1,6 @@
 ﻿using SwiftMessageReader.Models;
 
-namespace SwiftMessageReader.Data
+namespace SwiftMessageReader.Data.Interfaces
 {
     public interface ISwiftRepository
     {

@@ -1,16 +1,17 @@
 ﻿using System.Data.SQLite;
 
+using SwiftMessageReader.Exceptions;
 using SwiftMessageReader.Helpers;
 
 namespace SwiftMessageReader.Data
 {
-    public class DataBaseCreater
+    public class DataBaseCreator
     {
         private readonly IConfiguration configuration;
         private readonly string dbPath;
         private readonly string connectionString;
 
-        public DataBaseCreater(IConfiguration configuration)
+        public DataBaseCreator(IConfiguration configuration)
         {
             this.configuration = configuration;
             dbPath = configuration.GetConnectionString("DBFileLocation");
@@ -33,7 +34,19 @@ namespace SwiftMessageReader.Data
                 {
                     connection.Open();
 
-                    SQLiteCommand command = new SQLiteCommand("CREATE TABLE IF NOT EXISTS MyTable (ID INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT, Age INTEGER)", connection);
+                    SQLiteCommand command = new SQLiteCommand(
+                        "CREATE TABLE IF NOT EXISTS SwiftDatabase (" +
+                            "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                            "CreatedOn DATETIME NOT NULL, " +
+                            "SendersBankIdentifierCode TEXT NOT NULL, " +
+                            "MessageReferenceNumber TEXT NOT NULL, " +
+                            "TransactionReferenceNumber TEXT NOT NULL, " +
+                            "ReferenceAssinedByTheSender TEXT NOT NULL, " +
+                            "MessageBody TEXT NOT NULL, " +
+                            "MessageAuthenticationCode TEXT NOT NULL, " +
+                            "CheckValue TEXT NOT NULL" +
+                            ")",
+                        connection);
 
                     command.ExecuteNonQuery();
 
@@ -46,6 +59,7 @@ namespace SwiftMessageReader.Data
             catch (Exception ex)
             {
                 SwiftLogger.Error("An error when creating the database occured: " + ex);
+                throw new DatabaseCreationException("There was a problem whene creating the database.");
             }
         }
     }

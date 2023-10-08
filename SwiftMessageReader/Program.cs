@@ -1,7 +1,6 @@
 using NLog.Web;
-using NLog;
-using System.Data.Entity;
 using SwiftMessageReader.Data;
+using SwiftMessageReader.Services;
 
 namespace SwiftMessageReader
 {
@@ -20,7 +19,8 @@ namespace SwiftMessageReader
                 .CreateBuilder(args);
 
             // Add services to the container.
-
+            builder.Services.AddScoped<ISwiftService, SwiftService>();
+            builder.Services.AddScoped<ISwiftRepository, SwiftRepository>();
 
             // NLog: Setup NLog for Dependency injection
             builder.Logging.ClearProviders();
@@ -42,8 +42,8 @@ namespace SwiftMessageReader
 
             app.MapControllers();
 
-            //var databaseInitializer = new DataBaseCreater(builder.Configuration);
-            //databaseInitializer.Create();
+            var databaseInitializer = new DataBaseCreater(builder.Configuration);
+            databaseInitializer.Create();
 
             app.Run();
         }

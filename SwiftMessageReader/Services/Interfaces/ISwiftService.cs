@@ -1,6 +1,6 @@
 ﻿using SwiftMessageReader.Models;
 
-namespace SwiftMessageReader.Services
+namespace SwiftMessageReader.Services.Interfaces
 {
     public interface ISwiftService
     {

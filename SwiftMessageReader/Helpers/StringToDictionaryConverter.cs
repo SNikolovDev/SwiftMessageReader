@@ -2,21 +2,27 @@
 {
     public class StringToDictionaryConverter
     {
-        public static Dictionary<string, string> ConvertToDictionary(string text)
+        public static Dictionary<int, string> ConvertToDictionary(string text)
         {
-            var dict = new Dictionary<string, string>();
+            var data = new Dictionary<int, string>();
 
             var messageArray = text.Split(new[] { '{', '}' }, StringSplitOptions.RemoveEmptyEntries);
 
             var sendersBankIdentifierCode = messageArray[0].Split(':')[1];
+            data.Add(1, sendersBankIdentifierCode);
+
             var messageRefferenceNumber = messageArray[1].Split(":")[1];
+            data.Add(2, messageRefferenceNumber);
+
             var tag4 = messageArray[2];
 
             var splittedTag4 = Tag4Splitter(tag4);
 
-            var transactionReferenceNumber = string.Empty;
+            var transactionReferenceNumber = string.Empty;           
+
             var referenceAssinedByTheSender = string.Empty;
-            var messageText = string.Empty;
+
+            var messageBody = string.Empty;
 
             for (int i = 0; i < splittedTag4.Length; i++)
             {
@@ -32,17 +38,25 @@
                 {
                     for (int j = i + 1; j < splittedTag4.Length; j++)
                     {
-                        messageText += splittedTag4[j];
+                        messageBody += splittedTag4[j];
                     }
 
-                    messageText.TrimEnd();
+                    messageBody.TrimEnd();
                 }
             }
 
+            data.Add(3, transactionReferenceNumber);
+            data.Add(4, referenceAssinedByTheSender);
+            data.Add(5, messageBody);
+
             var messageAuthenticationCode = messageArray[4];
+            data.Add(6, messageAuthenticationCode);
+
             var CheckValue = messageArray[5];
+            data.Add(7, CheckValue);
+
             ;
-            return dict;
+            return data;
         }
 
         private static string[] Tag4Splitter(string text)

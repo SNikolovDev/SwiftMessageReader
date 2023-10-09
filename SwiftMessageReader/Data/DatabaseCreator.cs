@@ -5,13 +5,13 @@ using SwiftMessageReader.Helpers;
 
 namespace SwiftMessageReader.Data
 {
-    public class DataBaseCreator
+    public class DatabaseCreator
     {
         private readonly IConfiguration configuration;
         private readonly string dbPath;
         private readonly string connectionString;
 
-        public DataBaseCreator(IConfiguration configuration)
+        public DatabaseCreator(IConfiguration configuration)
         {
             this.configuration = configuration;
             dbPath = configuration.GetConnectionString("DBFileLocation");
@@ -50,7 +50,7 @@ namespace SwiftMessageReader.Data
 
                     command.ExecuteNonQuery();
 
-                  SwiftLogger.Info("Executed Non Query.");
+                  SwiftLogger.Info(NLogMessages.SuccessfulDatabaseCreation);
 
                     connection.Close();
                 }
@@ -58,8 +58,8 @@ namespace SwiftMessageReader.Data
             }
             catch (Exception ex)
             {
-                SwiftLogger.Error("An error when creating the database occured: " + ex);
-                throw new DatabaseCreationException("There was a problem whene creating the database.");
+                SwiftLogger.Error(NLogMessages.DatabaseCreateError + ex.Message);
+                throw new DatabaseCreationException(ex.Message);
             }
         }
     }

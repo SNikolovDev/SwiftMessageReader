@@ -13,20 +13,14 @@ namespace SwiftMessageReader.Services
         {
             this.repository = repository;
         }
-
         
         public void ManageFile(IFormFile file)
         {
-            var text = FileToStringConverter.ConvertIFormFileToString(file).ToString();
-            //using (var reader = new StreamReader(file.OpenReadStream()))
-            //{
-            //    text = reader.ReadToEnd();
-            //}
-
+            var text = FileToStringConverter.ConvertIFormFileToString(file);         
             var data = StringToDictionaryConverter.ConvertToDictionary(text);
-            var model = MessageModelMapper(data);
-            ;
 
+            var model = MessageModelMapper(data);
+            
             repository.InsertIntoDatabase(model);
         }
 
@@ -42,6 +36,8 @@ namespace SwiftMessageReader.Services
             model.MessageBody = data[5];
             model.MessageAuthenticationCode = data[6];
             model.CheckValue = data[7];
+
+            SwiftLogger.Info(NLogMessages.SuccessfulMapping);
 
             return model;
         }

@@ -38,7 +38,7 @@ namespace SwiftMessageReader
 
             app.MapControllers();
 
-            var databaseCreator = new DataBaseCreator(builder.Configuration);
+            var databaseCreator = new DatabaseCreator(builder.Configuration);
             databaseCreator.Create();
 
             app.Run();

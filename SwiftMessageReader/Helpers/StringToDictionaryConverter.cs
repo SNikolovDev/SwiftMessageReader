@@ -15,13 +15,10 @@
             data.Add(2, messageRefferenceNumber);
 
             var tag4 = messageArray[2];
-
             var splittedTag4 = Tag4Splitter(tag4);
 
-            var transactionReferenceNumber = string.Empty;           
-
+            var transactionReferenceNumber = string.Empty;
             var referenceAssinedByTheSender = string.Empty;
-
             var messageBody = string.Empty;
 
             for (int i = 0; i < splittedTag4.Length; i++)

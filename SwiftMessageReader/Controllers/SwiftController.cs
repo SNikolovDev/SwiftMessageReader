@@ -23,14 +23,12 @@ namespace SwiftReader.Controllers
             {
                 service.ManageFile(file);
 
-                SwiftLogger.Info("File uploaded");
-
+                SwiftLogger.Info(NLogMessages.SuccessfulUpload);
                 return Ok();
-
             }
             catch (Exception ex)
             {
-                SwiftLogger.Error("Error occures when trying to upload the file: " + ex);
+                SwiftLogger.Error(NLogMessages.UploadFailedError + ex.Message);
                 return StatusCode(StatusCodes.Status400BadRequest);
             }
         }

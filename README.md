@@ -1,28 +1,32 @@
 # SwiftMessageReader
-Web api which can read Swift MT799 messages from a text file and store the information into SQLite DB.
----
 
-# Getting started
-1. Download the application from github and run it with Visual Studio.
-2. The DatabaseCreater class will automaticly check if database file is present, if not - one will be created.
-3. If you want, you can change the localhost port number in launchSettings.json file (it's not mandatory).
-4. For convenience DBFileConnection and DefaultConnection strings in appsettings.json file are configured with relative paths, but the can be changed with once to the local storage, if needed.
+SwiftMessageReader is a web API designed to read Swift MT799 messages from a text file and store the information in an SQLite database.
 
-# Sample SWIFT MT799 Message File
----
-Sample file (Test Message .txt) is included in the project's main directory. Use it to test the application.
+## Getting Started
 
-# API Endpoints
----
-The main endpoint for the app is:
-- /api/message/insert - upload file here;
+### Prerequisites
+- Download the application from GitHub.
+- Open the project with Visual Studio.
 
-# Swagger
----
-Swagger tool is implemented in the project for ease of use. It's configured to run trough it.
+### Database Setup
+- The `DatabaseCreater` class will automatically check if the database file is present; if not, it will create one.
+- Optionally, you can modify the localhost port number in the `launchSettings.json` file (this is not mandatory).
+- For your convenience, `DBFileConnection` and `DefaultConnection` strings in the `appsettings.json` file are configured with relative paths. However, you can change them to point to local storage if needed.
 
-# Contact
----
-For questions, communication or feedback, my e-mail is:
-[snikolovdev@outlook.com]
+## Sample SWIFT MT799 Message File
 
+A sample file (`TestMessage.txt`) is included in the project's main directory. You can use this file to test the application.
+
+## API Endpoints
+
+The primary endpoint for the application is:
+
+- `/api/message/insert`: Upload a file here to process Swift MT799 messages.
+
+## Swagger
+
+Swagger, a helpful tool, is integrated into the project for ease of use. It's pre-configured and ready to run.
+
+## Contact
+
+For questions, communication, or feedback, feel free to reach out to me via email at [snikolovdev@outlook.com].

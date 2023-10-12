@@ -13,14 +13,14 @@ namespace SwiftMessageReader.Services
         {
             this.repository = repository;
         }
-        
+
         public void ManageFile(IFormFile file)
         {
-            var text = FileToStringConverter.ConvertIFormFileToString(file);         
+            var text = FileToStringConverter.ConvertIFormFileToString(file);
             var data = StringToDictionaryConverter.ConvertToDictionary(text);
 
             var model = MessageModelMapper(data);
-            
+
             repository.InsertIntoDatabase(model);
         }
 
@@ -29,13 +29,13 @@ namespace SwiftMessageReader.Services
             var model = new MessageModel();
 
             model.CreatedOn = DateTime.Now;
-            model.SendersBankIdentifierCode = data[1];
-            model.MessageReferenceNumber = data[2];
-            model.TransactionReferenceNumber = data[3];
-            model.ReferenceAssinedByTheSender = data[4];
-            model.MessageBody = data[5];
-            model.MessageAuthenticationCode = data[6];
-            model.CheckValue = data[7];
+            model.SendersBankIdentifierCode = data[Keys.SendersBankIdentifierKey];
+            model.MessageReferenceNumber = data[Keys.MessageReferenceNumberKey];
+            model.TransactionReferenceNumber = data[Keys.TransactionReferenceNumberKey];
+            model.ReferenceAssinedByTheSender = data[Keys.ReferenceAssinedByTheSenderKey];
+            model.MessageBody = data[Keys.MessageBodyKey];
+            model.MessageAuthenticationCode = data[Keys.MessageAuthenticationCodeKey];
+            model.CheckValue = data[Keys.CheckValueKey];
 
             SwiftLogger.Info(NLogMessages.SuccessfulMapping);
 

@@ -9,10 +9,10 @@
             var messageArray = text.Split(new[] { '{', '}' }, StringSplitOptions.RemoveEmptyEntries);
 
             var sendersBankIdentifierCode = messageArray[0].Split(':')[1];
-            data.Add(1, sendersBankIdentifierCode);
+            data.Add(Keys.SendersBankIdentifierKey, sendersBankIdentifierCode);
 
             var messageRefferenceNumber = messageArray[1].Split(":")[1];
-            data.Add(2, messageRefferenceNumber);
+            data.Add(Keys.MessageReferenceNumberKey, messageRefferenceNumber);
 
             var tag4 = messageArray[2];
             var splittedTag4 = Tag4Splitter(tag4);
@@ -23,15 +23,15 @@
 
             for (int i = 0; i < splittedTag4.Length; i++)
             {
-                if (splittedTag4[i] == "20")
+                if (splittedTag4[i] == Keys.TransactionReferenceNumberKey.ToString())
                 {
                     transactionReferenceNumber = splittedTag4[i + 1].TrimEnd();
                 }
-                if (splittedTag4[i] == "21")
+                if (splittedTag4[i] == Keys.ReferenceAssinedByTheSenderKey.ToString())
                 {
                     referenceAssinedByTheSender = splittedTag4[i + 1].TrimEnd();
                 }
-                if (splittedTag4[i] == "79")
+                if (splittedTag4[i] == Keys.MessageBodyKey.ToString())
                 {
                     for (int j = i + 1; j < splittedTag4.Length; j++)
                     {
@@ -42,17 +42,16 @@
                 }
             }
 
-            data.Add(3, transactionReferenceNumber);
-            data.Add(4, referenceAssinedByTheSender);
-            data.Add(5, messageBody);
+            data.Add(Keys.TransactionReferenceNumberKey, transactionReferenceNumber);
+            data.Add(Keys.ReferenceAssinedByTheSenderKey, referenceAssinedByTheSender);
+            data.Add(Keys.MessageBodyKey, messageBody);
 
             var messageAuthenticationCode = messageArray[4];
-            data.Add(6, messageAuthenticationCode);
+            data.Add(Keys.MessageAuthenticationCodeKey, messageAuthenticationCode);
 
             var CheckValue = messageArray[5];
-            data.Add(7, CheckValue);
+            data.Add(Keys.CheckValueKey, CheckValue);
 
-            ;
             return data;
         }
 

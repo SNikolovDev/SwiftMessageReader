@@ -1,4 +1,6 @@
-﻿namespace SwiftMessageReader.Helpers
+﻿using System.Text.RegularExpressions;
+
+namespace SwiftMessageReader.Helpers
 {
     public class StringToDictionaryConverter
     {
@@ -14,12 +16,16 @@
             var messageRefferenceNumber = messageArray[1].Split(":")[1];
             data.Add(Keys.MessageReferenceNumberKey, messageRefferenceNumber);
 
-            var tag4 = messageArray[2];
-            var splittedTag4 = Tag4Splitter(tag4);
+            var tag4 = messageArray[2].TrimEnd();
+            TagVerifier(tag4);
+            ;
+            var splittedTag4 = TextHeaderBlockSplitter(tag4);
 
             var transactionReferenceNumber = string.Empty;
             var referenceAssinedByTheSender = string.Empty;
             var messageBody = string.Empty;
+
+
 
             for (int i = 0; i < splittedTag4.Length; i++)
             {
@@ -55,7 +61,7 @@
             return data;
         }
 
-        private static string[] Tag4Splitter(string text)
+        private static string[] TextHeaderBlockSplitter(string text)
         {
             var parts = text.Split(':').ToList();
 
@@ -89,6 +95,18 @@
 
             var resultArray = resultList.ToArray();
             return resultArray;
+        }
+
+        private static void TagVerifier(string text)
+        {
+            var pattern = "^\\d\\:\\n?\\:\\d{2}\\:[0-9A-Z-]*\\s?\\n?:\\d{2}\\:[0-9A-Z-]*\\s?\\n?:\\d{2}\\:[\\x20-\\x2F\\x3A-\\x40A-Z0-9\\n]+[-]?$";
+            text = text.Replace("\r", "");
+            var isMatched = Regex.IsMatch(text, pattern);
+
+            if (!isMatched)
+            {
+                throw new Exception();
+            }
         }
     }
 }

@@ -18,17 +18,17 @@ namespace SwiftReader.Controllers
 
         [HttpPost("insert")]
         public IActionResult Insert(IFormFile file)
-        {
+        {// TODO: Add appropriate status codes.
             try
             {
                 service.ManageFile(file);
 
-                SwiftLogger.Info(NLogMessages.SuccessfulUpload);
+                SwiftLogger.Info(Messages.SuccessfulUpload);
                 return Ok();
             }
             catch (Exception ex)
             {
-                SwiftLogger.Error(NLogMessages.UploadFailedError + ex.Message);
+                SwiftLogger.Error(Messages.UploadFailedError + ex.Message);
                 return StatusCode(StatusCodes.Status400BadRequest);
             }
         }

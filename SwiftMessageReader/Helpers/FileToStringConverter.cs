@@ -24,7 +24,7 @@ public class FileToStringConverter
         }
         catch (ArgumentNullException ex)
         {
-            SwiftLogger.Error(NLogMessages.InvalidFileError);
+            SwiftLogger.Error(Messages.InvalidFileError);
             throw new ArgumentException(ex.Message);
         }
     }

@@ -48,7 +48,7 @@ namespace SwiftMessageReader.Data
                 AddToParametersWithValues(model, command);
                 command.ExecuteNonQuery();
 
-                SwiftLogger.Info(NLogMessages.SuccessfulDataInsert);
+                SwiftLogger.Info(Messages.SuccessfulDataInsert);
 
                 connection.Close();
             }

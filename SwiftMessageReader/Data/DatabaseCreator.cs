@@ -50,7 +50,7 @@ namespace SwiftMessageReader.Data
 
                     command.ExecuteNonQuery();
 
-                  SwiftLogger.Info(NLogMessages.SuccessfulDatabaseCreation);
+                  SwiftLogger.Info(Messages.SuccessfulDatabaseCreation);
 
                     connection.Close();
                 }
@@ -58,7 +58,7 @@ namespace SwiftMessageReader.Data
             }
             catch (Exception ex)
             {
-                SwiftLogger.Error(NLogMessages.DatabaseCreateError + ex.Message);
+                SwiftLogger.Error(Messages.DatabaseCreateError + ex.Message);
                 throw new DatabaseCreationException(ex.Message);
             }
         }

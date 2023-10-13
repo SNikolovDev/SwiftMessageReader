@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-
-using SwiftMessageReader.Data.Interfaces;
+﻿using SwiftMessageReader.Data.Interfaces;
 using SwiftMessageReader.Exceptions;
 using SwiftMessageReader.Helpers;
 using SwiftMessageReader.Models;
@@ -36,25 +34,24 @@ namespace SwiftMessageReader.Services
                 throw new Exception(ex.Message);
             }
 
-            var data = StringToDictionaryConverter.ConvertToDictionary(text);
-
-            var model = MessageModelMapper(data);
-
-            repository.InsertIntoDatabase(model);
+            var data = Parser.SplitDataTypes(text);
         }
 
-        private MessageModel MessageModelMapper(Dictionary<int, string> data)
+        private MessageModel MessageModelMapper(DataClass data)
         {
             var model = new MessageModel();
 
             model.CreatedOn = DateTime.Now;
-            model.SendersBankIdentifierCode = data[Keys.SendersBankIdentifierKey];
-            model.MessageReferenceNumber = data[Keys.MessageReferenceNumberKey];
-            model.TransactionReferenceNumber = data[Keys.TransactionReferenceNumberKey];
-            model.ReferenceAssinedByTheSender = data[Keys.ReferenceAssinedByTheSenderKey];
-            model.MessageBody = data[Keys.MessageBodyKey];
-            model.MessageAuthenticationCode = data[Keys.MessageAuthenticationCodeKey];
-            model.CheckValue = data[Keys.CheckValueKey];
+
+            model.SendersBankIdentifierCode = data.HeaderBlocks["1"];
+            model.MessageReferenceNumber = data.HeaderBlocks["2"];
+
+            model.TransactionReferenceNumber = data.TagsList[0].TagData;
+            model.ReferenceAssinedByTheSender = data.TagsList[1].TagData;
+            model.MessageBody = data.TagsList[2].TagData;
+
+            model.MessageAuthenticationCode = data.HeaderBlocks["5.1"];
+            model.CheckValue = data.HeaderBlocks["5.2"];
 
             SwiftLogger.Info(Messages.SuccessfulMapping);
 

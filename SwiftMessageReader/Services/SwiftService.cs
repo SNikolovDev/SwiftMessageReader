@@ -35,6 +35,8 @@ namespace SwiftMessageReader.Services
             }
 
             var data = Parser.SplitDataTypes(text);
+            var model = MessageModelMapper(data);
+            repository.InsertIntoDatabase(model);
         }
 
         private MessageModel MessageModelMapper(DataClass data)
@@ -43,15 +45,15 @@ namespace SwiftMessageReader.Services
 
             model.CreatedOn = DateTime.Now;
 
-            model.SendersBankIdentifierCode = data.HeaderBlocks["1"];
-            model.MessageReferenceNumber = data.HeaderBlocks["2"];
+            model.SendersBankIdentifierCode = data.HeaderBlocks[HeaderBlocks.BasicHeaderBlockIdentifier];
+            model.MessageReferenceNumber = data.HeaderBlocks[HeaderBlocks.ApplicationHeaderBlockIdentifier];
 
             model.TransactionReferenceNumber = data.TagsList[0].TagData;
             model.ReferenceAssinedByTheSender = data.TagsList[1].TagData;
             model.MessageBody = data.TagsList[2].TagData;
 
-            model.MessageAuthenticationCode = data.HeaderBlocks["5.1"];
-            model.CheckValue = data.HeaderBlocks["5.2"];
+            model.MessageAuthenticationCode = data.HeaderBlocks[HeaderBlocks.TrailerHeaderBlockIdentifier1];
+            model.CheckValue = data.HeaderBlocks[HeaderBlocks.TrailerHeaderBlockIdentifier2];
 
             SwiftLogger.Info(Messages.SuccessfulMapping);
 

@@ -5,12 +5,7 @@ using SwiftMessageReader.Models;
 namespace SwiftMessageReader.Helpers
 {
     public class Parser
-    {
-        private const string BasicHeaderBlockIdentifier = "1";
-        private const string ApplicationHeaderBlockIdentifier = "2";
-        private const string TrailerHeaderBlockIdentifier1 = "5.1";
-        private const string TrailerHeaderBlockIdentifier2 = "5.2";
-
+    {    
         private const string TransactionReferenceNumberTag = "20";
         private const string ReferenceAssignedByTheSenderTag = "21";
         private const string MessageBodyTag = "79";
@@ -85,10 +80,10 @@ namespace SwiftMessageReader.Helpers
                 }
             }
             ;
-            headerBlocks.Add(BasicHeaderBlockIdentifier, sendersBankIdentifierCode);
-            headerBlocks.Add(ApplicationHeaderBlockIdentifier, messageRefferenceNumber);
-            headerBlocks.Add(TrailerHeaderBlockIdentifier1, messageAuthenticationCode);
-            headerBlocks.Add(TrailerHeaderBlockIdentifier2, checkValue);
+            headerBlocks.Add(HeaderBlocks.BasicHeaderBlockIdentifier, sendersBankIdentifierCode);
+            headerBlocks.Add(HeaderBlocks.ApplicationHeaderBlockIdentifier, messageRefferenceNumber);
+            headerBlocks.Add(HeaderBlocks.TrailerHeaderBlockIdentifier1, messageAuthenticationCode);
+            headerBlocks.Add(HeaderBlocks.TrailerHeaderBlockIdentifier2, checkValue);
 
             dataClass.HeaderBlocks = headerBlocks;
             dataClass.TagsList = tagsList;

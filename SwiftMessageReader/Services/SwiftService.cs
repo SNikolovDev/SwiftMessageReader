@@ -39,25 +39,33 @@ namespace SwiftMessageReader.Services
             repository.InsertIntoDatabase(model);
         }
 
-        private MessageModel MessageModelMapper(DataClass data)
+        private TransferDataToRepository MessageModelMapper(TransferData data)
         {
-            var model = new MessageModel();
+            var insertModel = new TransferDataToRepository();
+            var model = new Blocks();
+            var tags = new List<Tag>();
 
             model.CreatedOn = DateTime.Now;
 
             model.SendersBankIdentifierCode = data.HeaderBlocks[HeaderBlocks.BasicHeaderBlockIdentifier];
             model.MessageReferenceNumber = data.HeaderBlocks[HeaderBlocks.ApplicationHeaderBlockIdentifier];
 
-            model.TransactionReferenceNumber = data.TagsList[0].TagData;
-            model.ReferenceAssinedByTheSender = data.TagsList[1].TagData;
-            model.MessageBody = data.TagsList[2].TagData;
+            foreach (var tag in data.TagsList)
+            {
+                var currentTag = new Tag(tag.TagNumber, tag.TagName, tag.TagData);
+                tags.Add(currentTag);
+            }
+
 
             model.MessageAuthenticationCode = data.HeaderBlocks[HeaderBlocks.TrailerHeaderBlockIdentifier1];
             model.CheckValue = data.HeaderBlocks[HeaderBlocks.TrailerHeaderBlockIdentifier2];
 
             SwiftLogger.Info(Messages.SuccessfulMapping);
 
-            return model;
+            insertModel.Model = model;
+            insertModel.Tags = tags;
+
+            return insertModel;
         }
     }
 }

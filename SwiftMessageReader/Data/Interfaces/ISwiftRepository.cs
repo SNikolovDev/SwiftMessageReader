@@ -4,6 +4,6 @@ namespace SwiftMessageReader.Data.Interfaces
 {
     public interface ISwiftRepository
     {
-        void InsertIntoDatabase(MessageModel model);
+        void InsertIntoDatabase(TransferDataToRepository model);
     }
 }

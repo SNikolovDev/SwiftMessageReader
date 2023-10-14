@@ -5,16 +5,16 @@ using SwiftMessageReader.Models;
 namespace SwiftMessageReader.Helpers
 {
     public class Parser
-    {    
+    {
         private const string TransactionReferenceNumberTag = "20";
         private const string ReferenceAssignedByTheSenderTag = "21";
         private const string MessageBodyTag = "79";
 
-        public static DataClass SplitDataTypes(string text)
+        public static TransferData SplitDataTypes(string text)
         {
             var headerBlocks = new Dictionary<string, string>();
             var tagsList = new List<Tag>();
-            var dataClass = new DataClass();
+            var dataClass = new TransferData();
 
             var messageArray = text.Split(new[] { '{', '}' }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -49,7 +49,7 @@ namespace SwiftMessageReader.Helpers
             }
 
             TagVerifier(textHeaderBlock);
-            ;
+
             var splittedTextHeaderBlock = TextHeaderBlockSplitter(textHeaderBlock);
 
             var transactionReferenceNumber = string.Empty;
@@ -79,7 +79,7 @@ namespace SwiftMessageReader.Helpers
                     tagsList.Add(new Tag(MessageBodyTag, nameof(messageBody), messageBody));
                 }
             }
-            ;
+
             headerBlocks.Add(HeaderBlocks.BasicHeaderBlockIdentifier, sendersBankIdentifierCode);
             headerBlocks.Add(HeaderBlocks.ApplicationHeaderBlockIdentifier, messageRefferenceNumber);
             headerBlocks.Add(HeaderBlocks.TrailerHeaderBlockIdentifier1, messageAuthenticationCode);

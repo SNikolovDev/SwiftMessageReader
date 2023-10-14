@@ -1,6 +1,6 @@
 ﻿namespace SwiftMessageReader.Models
 {
-    public class DataClass
+    public class TransferData
     {
         public Dictionary<string, string> HeaderBlocks { get; set; }
 

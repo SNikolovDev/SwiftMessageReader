@@ -18,35 +18,53 @@ namespace SwiftMessageReader.Data
             connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public void InsertIntoDatabase(MessageModel model)
+        public void InsertIntoDatabase(TransferDataToRepository model)
         {
+            var message = model.Model;
+            var tags = model.Tags;
+
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
 
-                SQLiteCommand command = new SQLiteCommand(connection);
+                string insertIntoBlcokString = @"
+                  INSERT INTO SwiftMessage(
+                    CreatedOn,
+                    SendersBankIdentifierCode,
+                    MessageReferenceNumber,
+                    MessageAuthenticationCode,
+                    CheckValue)
 
-                command.CommandText = "INSERT INTO SwiftDatabase (" +
-                    "CreatedOn, " +
-                    "SendersBankIdentifierCode, " +
-                    "MessageReferenceNumber, " +
-                    "TransactionReferenceNumber, " +
-                    "ReferenceAssinedByTheSender, " +
-                    "MessageBody, " +
-                    "MessageAuthenticationCode, " +
-                    "CheckValue) " +
-                    "VALUES (" +
-                    "@CreatedOn, " +
-                    "@SendersBankIdentifierCode, " +
-                    "@MessageReferenceNumber, " +
-                    "@TransactionReferenceNumber, " +
-                    "@ReferenceAssinedByTheSender, " +
-                    "@MessageBody, " +
-                    "@MessageAuthenticationCode, " +
-                    "@CheckValue)";
+                  VALUES (
+                    @CreatedOn,
+                    @SendersBankIdentifierCode,
+                    @MessageReferenceNumber,                  
+                    @MessageAuthenticationCode,
+                    @CheckValue)";
 
-                AddToParametersWithValues(model, command);
-                command.ExecuteNonQuery();
+                string insertIntoTagsString = @"
+                  INSERT INTO TagsInformationTable(
+                    SwiftMessageId,
+                    CreatedOn,
+                    TagNumber,
+                    TagName,
+                    TagData)
+
+                   VALUES (
+                     @SwiftMessageId,
+                     @CreatedOn,
+                     @TagNumber,
+                     @TagName,
+                     @TagData)";
+
+                var insretBlockCmd = new SQLiteCommand(insertIntoBlcokString, connection);
+                var insertTagsCmd = new SQLiteCommand(insertIntoTagsString, connection);
+
+                AddBlockParamsWithValues(message, insretBlockCmd);
+                insretBlockCmd.ExecuteNonQuery();
+                int swiftMessageId = (int)connection.LastInsertRowId;
+
+                AddTagsParamsWithValues(tags, insertTagsCmd, swiftMessageId);
 
                 SwiftLogger.Info(Messages.SuccessfulDataInsert);
 
@@ -54,16 +72,28 @@ namespace SwiftMessageReader.Data
             }
         }
 
-        private static void AddToParametersWithValues(MessageModel model, SQLiteCommand command)
+        private static void AddBlockParamsWithValues(Blocks model, SQLiteCommand command)
         {
             command.Parameters.AddWithValue("@CreatedOn", model.CreatedOn);
             command.Parameters.AddWithValue("@SendersBankIdentifierCode", model.SendersBankIdentifierCode);
             command.Parameters.AddWithValue("@MessageReferenceNumber", model.MessageReferenceNumber);
-            command.Parameters.AddWithValue("@TransactionReferenceNumber", model.TransactionReferenceNumber);
-            command.Parameters.AddWithValue("@ReferenceAssinedByTheSender", model.ReferenceAssinedByTheSender);
-            command.Parameters.AddWithValue("@MessageBody", model.MessageBody);
             command.Parameters.AddWithValue("@MessageAuthenticationCode", model.MessageAuthenticationCode);
             command.Parameters.AddWithValue("@CheckValue", model.CheckValue);
+        }
+        private static void AddTagsParamsWithValues(List<Tag> tags, SQLiteCommand command, int swiftMessageId)
+        {
+            foreach (var tag in tags)
+            {
+                command.Parameters.Clear();
+
+                command.Parameters.AddWithValue("@SwiftMessageId", swiftMessageId);
+                command.Parameters.AddWithValue("@CreatedOn", tag.CreatedOn);
+                command.Parameters.AddWithValue("@TagNumber", tag.TagNumber);
+                command.Parameters.AddWithValue("@TagName", tag.TagName);
+                command.Parameters.AddWithValue("@TagData", tag.TagData);
+
+                command.ExecuteNonQuery();
+            }
         }
     }
 }

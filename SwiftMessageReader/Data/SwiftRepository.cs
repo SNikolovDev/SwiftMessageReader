@@ -18,10 +18,10 @@ namespace SwiftMessageReader.Data
             connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public void InsertIntoDatabase(TransferDataToRepository model)
+        public void InsertIntoDatabase(TransferData model)
         {
-            var message = model.Model;
-            var tags = model.Tags;
+            var blocks = model.BlocksList;
+            var tags = model.TagsList;
 
             using (var connection = new SQLiteConnection(connectionString))
             {
@@ -30,17 +30,15 @@ namespace SwiftMessageReader.Data
                 string insertIntoBlcokString = @"
                   INSERT INTO SwiftMessage(
                     CreatedOn,
-                    SendersBankIdentifierCode,
-                    MessageReferenceNumber,
-                    MessageAuthenticationCode,
-                    CheckValue)
+                    BlockNumber,
+                    BlockName,
+                    BlockData)
 
                   VALUES (
                     @CreatedOn,
-                    @SendersBankIdentifierCode,
-                    @MessageReferenceNumber,                  
-                    @MessageAuthenticationCode,
-                    @CheckValue)";
+                    @BlockNumber,
+                    @BlockName,                  
+                    @BlockData)";
 
                 string insertIntoTagsString = @"
                   INSERT INTO TagsInformationTable(
@@ -60,10 +58,8 @@ namespace SwiftMessageReader.Data
                 var insretBlockCmd = new SQLiteCommand(insertIntoBlcokString, connection);
                 var insertTagsCmd = new SQLiteCommand(insertIntoTagsString, connection);
 
-                AddBlockParamsWithValues(message, insretBlockCmd);
-                insretBlockCmd.ExecuteNonQuery();
+                AddBlockParamsWithValues(blocks, insretBlockCmd);
                 int swiftMessageId = (int)connection.LastInsertRowId;
-
                 AddTagsParamsWithValues(tags, insertTagsCmd, swiftMessageId);
 
                 SwiftLogger.Info(Messages.SuccessfulDataInsert);
@@ -72,13 +68,19 @@ namespace SwiftMessageReader.Data
             }
         }
 
-        private static void AddBlockParamsWithValues(Blocks model, SQLiteCommand command)
+        private static void AddBlockParamsWithValues(List<Block> blocks, SQLiteCommand command)
         {
-            command.Parameters.AddWithValue("@CreatedOn", model.CreatedOn);
-            command.Parameters.AddWithValue("@SendersBankIdentifierCode", model.SendersBankIdentifierCode);
-            command.Parameters.AddWithValue("@MessageReferenceNumber", model.MessageReferenceNumber);
-            command.Parameters.AddWithValue("@MessageAuthenticationCode", model.MessageAuthenticationCode);
-            command.Parameters.AddWithValue("@CheckValue", model.CheckValue);
+            foreach (var block in blocks)
+            {
+                command.Parameters.Clear();
+
+                command.Parameters.AddWithValue("@CreatedOn", block.CreatedOn);
+                command.Parameters.AddWithValue("@BlockNumber", block.BlockNumber);
+                command.Parameters.AddWithValue("@BlockName", block.BlockName);
+                command.Parameters.AddWithValue("@BlockData", block.BlockData);
+
+                command.ExecuteNonQuery();
+            }
         }
         private static void AddTagsParamsWithValues(List<Tag> tags, SQLiteCommand command, int swiftMessageId)
         {

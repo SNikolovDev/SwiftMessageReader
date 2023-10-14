@@ -17,13 +17,13 @@ namespace SwiftMessageReader.Services
 
         public void ManageFile(IFormFile file)
         {
-            var text = string.Empty;
+            var fileAsString = string.Empty;
             // TODO: Throw an exception if false;
             try
             {
                 // Exception thrown from TagVerifier!
-                text = FileToStringConverter.ConvertIFormFileToString(file);
-                StringToModelParser.CurlyBracketsVerifier(text);
+                fileAsString = FileToStringConverter.ConvertIFormFileToString(file);
+                MessageStructureVerifiers.CurlyBracketsVerifier(fileAsString);
             }
             catch (WrongMessageStructureException)
             {
@@ -34,21 +34,24 @@ namespace SwiftMessageReader.Services
                 throw new Exception(ex.Message);
             }
 
-            var data = Parser.SplitDataTypes(text);
-            var model = MessageModelMapper(data);
+            var blocksAndTags = Parser.SplitByBlocksAndTags(fileAsString);
+
+
+            var model = MessageModelMapper(blocksAndTags);
             repository.InsertIntoDatabase(model);
         }
 
-        private TransferDataToRepository MessageModelMapper(TransferData data)
+        private TransferData MessageModelMapper(TransferData data)
         {
-            var insertModel = new TransferDataToRepository();
-            var model = new Blocks();
+            var returnModel = new TransferData();
+            var blocks = new List<Block>();
             var tags = new List<Tag>();
 
-            model.CreatedOn = DateTime.Now;
-
-            model.SendersBankIdentifierCode = data.HeaderBlocks[HeaderBlocks.BasicHeaderBlockIdentifier];
-            model.MessageReferenceNumber = data.HeaderBlocks[HeaderBlocks.ApplicationHeaderBlockIdentifier];
+            foreach (var block in data.BlocksList)
+            {
+                var newBlock = new Block(block.BlockNumber, block.BlockName, block.BlockData);
+                blocks.Add(newBlock);
+            }
 
             foreach (var tag in data.TagsList)
             {
@@ -56,16 +59,12 @@ namespace SwiftMessageReader.Services
                 tags.Add(currentTag);
             }
 
-
-            model.MessageAuthenticationCode = data.HeaderBlocks[HeaderBlocks.TrailerHeaderBlockIdentifier1];
-            model.CheckValue = data.HeaderBlocks[HeaderBlocks.TrailerHeaderBlockIdentifier2];
+            returnModel.BlocksList = blocks;
+            returnModel.TagsList = tags;
 
             SwiftLogger.Info(Messages.SuccessfulMapping);
 
-            insertModel.Model = model;
-            insertModel.Tags = tags;
-
-            return insertModel;
+            return returnModel;
         }
     }
 }

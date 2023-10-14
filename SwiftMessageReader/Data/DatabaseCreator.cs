@@ -28,6 +28,7 @@ namespace SwiftMessageReader.Data
                 }
 
                 SQLiteConnection.CreateFile(dbPath);
+
                 SwiftLogger.Info("Database created.");
 
                 using (var connection = new SQLiteConnection(connectionString))
@@ -38,10 +39,9 @@ namespace SwiftMessageReader.Data
                         "CREATE TABLE IF NOT EXISTS SwiftMessage (" +
                             "Id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                             "CreatedOn DATETIME NOT NULL, " +
-                            "SendersBankIdentifierCode TEXT NOT NULL, " +
-                            "MessageReferenceNumber TEXT NOT NULL, " +
-                            "MessageAuthenticationCode TEXT NOT NULL, " +
-                            "CheckValue TEXT NOT NULL" +
+                            "BlockNumber TEXT NOT NULL, " +
+                            "BlockName TEXT NOT NULL, " +
+                            "BlockData TEXT NOT NULL" +
                             ")",
                         connection);
 
@@ -53,7 +53,7 @@ namespace SwiftMessageReader.Data
                             "TagNumber TEXT NOT NULL, " +
                             "TagName TEXT NOT NULL, " +
                             "TagData TEXT NOT NULL, " +
-                            "FOREIGN KEY (SwiftMessageId) REFERENCES SwiftMessage(Id) " +
+                            "FOREIGN KEY (SwiftMessageId) REFERENCES SwiftMessage(Id)" +
                           ")",
                         connection);
 
@@ -64,6 +64,7 @@ namespace SwiftMessageReader.Data
 
                     connection.Close();
                 }
+
             }
             catch (Exception ex)
             {

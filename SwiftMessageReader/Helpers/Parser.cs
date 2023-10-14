@@ -10,88 +10,96 @@ namespace SwiftMessageReader.Helpers
         private const string ReferenceAssignedByTheSenderTag = "21";
         private const string MessageBodyTag = "79";
 
-        public static TransferData SplitDataTypes(string text)
+        private const string TransactionReferenceNumberName = "Transacton reference number";
+        private const string ReferenceAssignedByTheSenderName = "Reference assigned by the sender";
+        private const string SendersBankIdentifierCodeName = "Senders bank identifier code";
+        private const string MessageBodyName = "Message refference number";
+        private const string TextHeaderBlockName = "Text header block";
+        private const string MessageAuthenticationCodeName = "Message authentication code";
+        private const string CheckValueName = "Check value";
+        private const string MessageAuthenticationCodeАbbreviation = "MAC";
+        private const string CheckValueAbbreviation = "CHK";
+
+        public const string BasicHeaderBlockIdentifier = "1";
+        public const string ApplicationHeaderBlockIdentifier = "2";
+        public const string TextHeaderBlockIdentifier = "4";
+        public const string TrailerHeaderBlockIdentifier = "5";
+
+        public static TransferData SplitByBlocksAndTags(string messageText)
         {
-            var headerBlocks = new Dictionary<string, string>();
+            var transferData = new TransferData();
+
             var tagsList = new List<Tag>();
-            var dataClass = new TransferData();
+            var blocksList = new List<Block>();
+            var splittedTextHeaderBlock = new List<string>();
 
-            var messageArray = text.Split(new[] { '{', '}' }, StringSplitOptions.RemoveEmptyEntries);
-
-            var sendersBankIdentifierCode = string.Empty;
-            var messageRefferenceNumber = string.Empty;
-            var textHeaderBlock = string.Empty;
-            var messageAuthenticationCode = string.Empty;
-            var checkValue = string.Empty;
+            var messageArray = messageText.Split(new[] { '{', '}' }, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (var item in messageArray)
             {
-                if (item.StartsWith('1'))
+                Block block = null;
+
+                if (item.StartsWith(BasicHeaderBlockIdentifier))
                 {
-                    sendersBankIdentifierCode = item.Substring(2);
+                    block = new Block(item.Take(1).ToString(), SendersBankIdentifierCodeName, item.Substring(2));
                 }
-                else if (item.StartsWith('2'))
+                else if (item.StartsWith(ApplicationHeaderBlockIdentifier))
                 {
-                    messageRefferenceNumber = item.Substring(2);
+                    block = new Block(item.Take(1).ToString(), MessageBodyName, item.Substring(2));
                 }
-                else if (item.StartsWith('4'))
+                else if (item.StartsWith(TextHeaderBlockIdentifier))
                 {
-                    textHeaderBlock = item.TrimEnd();
+                    TagVerifier(item);
+                    splittedTextHeaderBlock = TextHeaderBlockSplitter(item);
+                    block = new Block(item.Take(1).ToString(), TextHeaderBlockName, item.Substring(2).TrimEnd());
                 }
-                else if (item.StartsWith("MAC"))
+                else if (item.StartsWith(MessageAuthenticationCodeАbbreviation))
                 {
-                    messageAuthenticationCode = item;
+                    block = new Block(TrailerHeaderBlockIdentifier, MessageAuthenticationCodeName, item);
                 }
-                else if (item.StartsWith("CHK"))
+                else if (item.StartsWith(CheckValueAbbreviation))
                 {
-                    checkValue = item;
+                    block = new Block(TrailerHeaderBlockIdentifier, CheckValueName, item);
+                }
+
+                if (block != null)
+                {
+                    blocksList.Add(block);
                 }
             }
-
-            TagVerifier(textHeaderBlock);
-
-            var splittedTextHeaderBlock = TextHeaderBlockSplitter(textHeaderBlock);
-
-            var transactionReferenceNumber = string.Empty;
-            var referenceAssinedByTheSender = string.Empty;
             var messageBody = string.Empty;
 
-            for (int i = 1; i < splittedTextHeaderBlock.Length; i += 2)
+            for (int i = 1; i < splittedTextHeaderBlock.Count; i += 2)
             {
                 if (splittedTextHeaderBlock[i] == TransactionReferenceNumberTag)
                 {
-                    tagsList.Add(new Tag(TransactionReferenceNumberTag, nameof(transactionReferenceNumber), splittedTextHeaderBlock[i + 1].TrimEnd()));
+                    tagsList.Add(new Tag(TransactionReferenceNumberTag, TransactionReferenceNumberName, splittedTextHeaderBlock[i + 1].TrimEnd()));
                 }
                 else if (splittedTextHeaderBlock[i] == ReferenceAssignedByTheSenderTag)
                 {
-                    tagsList.Add(new Tag(ReferenceAssignedByTheSenderTag, nameof(referenceAssinedByTheSender), splittedTextHeaderBlock[i + 1].TrimEnd()));
+                    tagsList.Add(new Tag(ReferenceAssignedByTheSenderTag, ReferenceAssignedByTheSenderName, splittedTextHeaderBlock[i + 1].TrimEnd()));
 
                 }
                 else if (splittedTextHeaderBlock[i] == MessageBodyTag)
                 {
-                    for (int j = i + 1; j < splittedTextHeaderBlock.Length; j++)
+                    for (int j = i + 1; j < splittedTextHeaderBlock.Count; j++)
                     {
                         messageBody += splittedTextHeaderBlock[j];
                     }
 
                     messageBody.TrimEnd();
 
-                    tagsList.Add(new Tag(MessageBodyTag, nameof(messageBody), messageBody));
+                    tagsList.Add(new Tag(MessageBodyTag, MessageBodyName, messageBody));
                 }
             }
 
-            headerBlocks.Add(HeaderBlocks.BasicHeaderBlockIdentifier, sendersBankIdentifierCode);
-            headerBlocks.Add(HeaderBlocks.ApplicationHeaderBlockIdentifier, messageRefferenceNumber);
-            headerBlocks.Add(HeaderBlocks.TrailerHeaderBlockIdentifier1, messageAuthenticationCode);
-            headerBlocks.Add(HeaderBlocks.TrailerHeaderBlockIdentifier2, checkValue);
+            transferData.BlocksList = blocksList;
+            transferData.TagsList = tagsList;
 
-            dataClass.HeaderBlocks = headerBlocks;
-            dataClass.TagsList = tagsList;
-
-            return dataClass;
+            return transferData;
         }
 
-        private static string[] TextHeaderBlockSplitter(string text)
+        private static List<string> TextHeaderBlockSplitter(string text)
         {
             var parts = text.Split(':').ToList();
 
@@ -123,8 +131,7 @@ namespace SwiftMessageReader.Helpers
 
             resultList.Add(after79.TrimStart(':'));
 
-            var resultArray = resultList.ToArray();
-            return resultArray;
+            return resultList;
         }
 
         private static void TagVerifier(string text)

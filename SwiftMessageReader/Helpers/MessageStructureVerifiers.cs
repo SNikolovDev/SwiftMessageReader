@@ -1,9 +1,8 @@
-﻿
-using SwiftMessageReader.Exceptions;
+﻿using SwiftMessageReader.Exceptions;
 
 namespace SwiftMessageReader.Helpers
 {
-    public static class StringToModelParser
+    public static class MessageStructureVerifiers
     {
         public static void CurlyBracketsVerifier(string input)
         {

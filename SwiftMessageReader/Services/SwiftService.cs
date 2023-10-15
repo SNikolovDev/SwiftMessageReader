@@ -8,7 +8,7 @@ namespace SwiftMessageReader.Services
 {
     public class SwiftService : ISwiftService
     {
-        private ISwiftRepository repository;
+        private readonly ISwiftRepository repository;
 
         public SwiftService(ISwiftRepository repository)
         {
@@ -33,7 +33,7 @@ namespace SwiftMessageReader.Services
             catch (WrongBracketsSequence)
             {
                 SwiftLogger.Error(Messages.WrongBracketsSequence);
-                throw new ArgumentException(Messages.WrongBracketsSequence);
+                throw new WrongBracketsSequence(Messages.WrongBracketsSequence);
             }
             catch (WrongMessageStructure)
             {

@@ -8,9 +8,9 @@ namespace SwiftMessageReader.Models
         {
             this.CreatedOn = DateTime.Now;
 
-            this.TransactionReferenceNumberTag = TagsConstants.TransactionReferenceNumberTag;
-            this.ReferenceAssinedByTheSenderTag = TagsConstants.ReferenceAssignedByTheSenderTag;
-            this.MessageBodyTag = TagsConstants.MessageBodyTag;
+            this.TransactionReferenceNumberTag = TagConstants.TransactionReferenceNumberTag;
+            this.ReferenceAssinedByTheSenderTag = TagConstants.ReferenceAssignedByTheSenderTag;
+            this.MessageBodyTag = TagConstants.MessageBodyTag;
         }
 
         public DateTime CreatedOn { get; set; }

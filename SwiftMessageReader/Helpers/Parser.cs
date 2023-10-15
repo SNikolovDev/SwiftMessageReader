@@ -15,7 +15,6 @@ namespace SwiftMessageReader.Helpers
         public static TransferData SplitByBlocksAndTags(string messageText)
         {
             var transferData = new TransferData();
-
             var blocks = new Blocks();
             var tags = new Tags();
             var splittedTextHeaderBlock = new List<string>();
@@ -26,11 +25,11 @@ namespace SwiftMessageReader.Helpers
             {
                 if (item.StartsWith(BasicHeaderBlockIdentifier))
                 {
-                    blocks.SendersBankIdentifierCode = item.Substring(2);
+                    blocks.SendersBankIdentifierCode = item[2..];
                 }
                 if (item.StartsWith(ApplicationHeaderBlockIdentifier))
                 {
-                    blocks.MessageReferenceNumber = item.Substring(2);
+                    blocks.MessageReferenceNumber = item[2..];
                 }
                 if (item.StartsWith(TextHeaderBlockIdentifier))
                 {
@@ -51,30 +50,27 @@ namespace SwiftMessageReader.Helpers
 
             for (int i = 1; i < splittedTextHeaderBlock.Count; i += 2)
             {
-                if (splittedTextHeaderBlock[i] == TagsConstants.TransactionReferenceNumberTag)
+                if (splittedTextHeaderBlock[i] == TagConstants.TransactionReferenceNumberTag)
                 {
                     tags.TransactionReferenceNumber = splittedTextHeaderBlock[i + 1].TrimEnd();
                 }
-                if (splittedTextHeaderBlock[i] == TagsConstants.ReferenceAssignedByTheSenderTag)
+                if (splittedTextHeaderBlock[i] == TagConstants.ReferenceAssignedByTheSenderTag)
                 {
                     tags.ReferenceAssinedByTheSender = splittedTextHeaderBlock[i + 1].TrimEnd();
                 }
-                if (splittedTextHeaderBlock[i] == TagsConstants.MessageBodyTag)
+                if (splittedTextHeaderBlock[i] == TagConstants.MessageBodyTag)
                 {
                     for (int j = i + 1; j < splittedTextHeaderBlock.Count; j++)
                     {
                         messageBody += splittedTextHeaderBlock[j];
                     }
 
-                    messageBody.TrimEnd();
-
-                    tags.MessageBody = messageBody;
+                    tags.MessageBody = messageBody.TrimEnd();
                 }
             }
 
             transferData.Blocks = blocks;
             transferData.Tags = tags;
-
             return transferData;
         }
 
@@ -109,7 +105,6 @@ namespace SwiftMessageReader.Helpers
             }
 
             resultList.Add(after79.TrimStart(':'));
-
             return resultList;
         }
     }

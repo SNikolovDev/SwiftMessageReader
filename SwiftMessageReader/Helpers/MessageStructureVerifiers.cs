@@ -31,7 +31,6 @@ namespace SwiftMessageReader.Helpers
             {
                 isEven = false;
             }
-
             if (isEven == false)
             {
                 SwiftLogger.Error(Messages.WrongBracketsSequence);

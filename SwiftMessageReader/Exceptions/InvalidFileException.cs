@@ -4,7 +4,7 @@
     {
         public InvalidFileException(string message)
         {
-            
+
         }
     }
 }

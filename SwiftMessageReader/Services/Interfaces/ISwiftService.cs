@@ -1,6 +1,4 @@
-﻿using SwiftMessageReader.Models;
-
-namespace SwiftMessageReader.Services.Interfaces
+﻿namespace SwiftMessageReader.Services.Interfaces
 {
     public interface ISwiftService
     {

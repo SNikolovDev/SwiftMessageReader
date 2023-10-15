@@ -4,7 +4,7 @@
     {
         public DatabaseCreationException(string message)
         {
-            
+
         }
     }
 }

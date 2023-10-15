@@ -10,7 +10,7 @@ namespace SwiftReader.Controllers
     [Route("api/message")]
     public class SwiftController : ControllerBase
     {
-        private ISwiftService service;
+        private readonly ISwiftService service;
 
         public SwiftController(ISwiftService service)
         {

@@ -4,7 +4,7 @@
     {
         public WrongMessageStructure(string message)
         {
-            
+
         }
     }
 }

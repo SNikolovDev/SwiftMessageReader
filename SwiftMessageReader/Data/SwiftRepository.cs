@@ -8,12 +8,10 @@ namespace SwiftMessageReader.Data
 {
     public class SwiftRepository : ISwiftRepository
     {
-        private readonly IConfiguration configuration;
         private readonly string connectionString;
 
         public SwiftRepository(IConfiguration configuration)
         {
-            this.configuration = configuration;
             connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 

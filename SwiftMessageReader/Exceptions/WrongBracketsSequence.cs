@@ -4,7 +4,7 @@
     {
         public WrongBracketsSequence(string message)
         {
-         
+
         }
     }
 }

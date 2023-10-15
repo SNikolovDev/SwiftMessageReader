@@ -36,26 +36,31 @@ namespace SwiftMessageReader.Data
                     connection.Open();
 
                     var command = new SQLiteCommand(
-                        "CREATE TABLE IF NOT EXISTS SwiftMessage (" +
-                            "Id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                            "CreatedOn DATETIME NOT NULL, " +
-                            "BlockNumber TEXT NOT NULL, " +
-                            "BlockName TEXT NOT NULL, " +
-                            "BlockData TEXT NOT NULL" +
-                            ")",
+                      "CREATE TABLE IF NOT EXISTS SwiftMessage (" +
+                        "Id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "CreatedOn DATETIME NOT NULL, " +
+                        "SendersBankIdentifierCode TEXT NOT NULL, " +
+                        "MessageReferenceNumber TEXT NOT NULL, " +
+                        "MessageAuthenticationCode TEXT NOT NULL, " +
+                        "CheckValue TEXT NOT NULL" +
+                        ")",
                         connection);
 
                     var secondCommand = new SQLiteCommand(
-                        "CREATE TABLE IF NOT EXISTS TagsInformationTable (" +
-                            "Id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                            "SwiftMessageId INTEGER NOT NULL, " +
-                            "CreatedOn DATETIME NOT NULL, " +
-                            "TagNumber TEXT NOT NULL, " +
-                            "TagName TEXT NOT NULL, " +
-                            "TagData TEXT NOT NULL, " +
-                            "FOREIGN KEY (SwiftMessageId) REFERENCES SwiftMessage(Id)" +
-                          ")",
+                      "CREATE TABLE IF NOT EXISTS TagsInformationTable (" +
+                        "Id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "SwiftMessageId INTEGER NOT NULL, " +
+                        "CreatedOn DATETIME NOT NULL, " +
+                        "TransactionReferenceNumberTag TEXT NOT NULL, " +
+                        "TransactionReferenceNumber TEXT NOT NULL, " +
+                        "ReferenceAssinedByTheSenderTag TEXT NOT NULL, " +
+                        "ReferenceAssinedByTheSender TEXT NOT NULL, " +
+                        "MessageBodyTag TEXT NOT NULL, " +
+                        "MessageBody TEXT NOT NULL, " +
+                        "FOREIGN KEY (SwiftMessageId) REFERENCES SwiftMessage(Id)" +
+                        ")",
                         connection);
+
 
                     command.ExecuteNonQuery();
                     secondCommand.ExecuteNonQuery();

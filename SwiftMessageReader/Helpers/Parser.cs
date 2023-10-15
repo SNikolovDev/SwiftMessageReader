@@ -1,22 +1,9 @@
-﻿using System.Text.RegularExpressions;
-
-using SwiftMessageReader.Models;
+﻿using SwiftMessageReader.Models;
 
 namespace SwiftMessageReader.Helpers
 {
     public class Parser
     {
-        private const string TransactionReferenceNumberTag = "20";
-        private const string ReferenceAssignedByTheSenderTag = "21";
-        private const string MessageBodyTag = "79";
-
-        private const string TransactionReferenceNumberName = "Transacton reference number";
-        private const string ReferenceAssignedByTheSenderName = "Reference assigned by the sender";
-        private const string SendersBankIdentifierCodeName = "Senders bank identifier code";
-        private const string MessageBodyName = "Message refference number";
-        private const string TextHeaderBlockName = "Text header block";
-        private const string MessageAuthenticationCodeName = "Message authentication code";
-        private const string CheckValueName = "Check value";
         private const string MessageAuthenticationCodeАbbreviation = "MAC";
         private const string CheckValueAbbreviation = "CHK";
 
@@ -29,58 +16,50 @@ namespace SwiftMessageReader.Helpers
         {
             var transferData = new TransferData();
 
-            var tagsList = new List<Tag>();
-            var blocksList = new List<Block>();
+            var blocks = new Blocks();
+            var tags = new Tags();
             var splittedTextHeaderBlock = new List<string>();
 
             var messageArray = messageText.Split(new[] { '{', '}' }, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (var item in messageArray)
             {
-                Block block = null;
-
                 if (item.StartsWith(BasicHeaderBlockIdentifier))
                 {
-                    block = new Block(item.Take(1).ToString(), SendersBankIdentifierCodeName, item.Substring(2));
+                    blocks.SendersBankIdentifierCode = item.Substring(2);
                 }
-                else if (item.StartsWith(ApplicationHeaderBlockIdentifier))
+                if (item.StartsWith(ApplicationHeaderBlockIdentifier))
                 {
-                    block = new Block(item.Take(1).ToString(), MessageBodyName, item.Substring(2));
+                    blocks.MessageReferenceNumber = item.Substring(2);
                 }
-                else if (item.StartsWith(TextHeaderBlockIdentifier))
+                if (item.StartsWith(TextHeaderBlockIdentifier))
                 {
-                    TagVerifier(item);
+                    MessageStructureVerifiers.TagVerifier(item);
                     splittedTextHeaderBlock = TextHeaderBlockSplitter(item);
-                    block = new Block(item.Take(1).ToString(), TextHeaderBlockName, item.Substring(2).TrimEnd());
                 }
-                else if (item.StartsWith(MessageAuthenticationCodeАbbreviation))
+                if (item.StartsWith(MessageAuthenticationCodeАbbreviation))
                 {
-                    block = new Block(TrailerHeaderBlockIdentifier, MessageAuthenticationCodeName, item);
+                    blocks.MessageAuthenticationCode = item;
                 }
-                else if (item.StartsWith(CheckValueAbbreviation))
+                if (item.StartsWith(CheckValueAbbreviation))
                 {
-                    block = new Block(TrailerHeaderBlockIdentifier, CheckValueName, item);
-                }
-
-                if (block != null)
-                {
-                    blocksList.Add(block);
+                    blocks.CheckValue = item;
                 }
             }
+
             var messageBody = string.Empty;
 
             for (int i = 1; i < splittedTextHeaderBlock.Count; i += 2)
             {
-                if (splittedTextHeaderBlock[i] == TransactionReferenceNumberTag)
+                if (splittedTextHeaderBlock[i] == TagsConstants.TransactionReferenceNumberTag)
                 {
-                    tagsList.Add(new Tag(TransactionReferenceNumberTag, TransactionReferenceNumberName, splittedTextHeaderBlock[i + 1].TrimEnd()));
+                    tags.TransactionReferenceNumber = splittedTextHeaderBlock[i + 1].TrimEnd();
                 }
-                else if (splittedTextHeaderBlock[i] == ReferenceAssignedByTheSenderTag)
+                if (splittedTextHeaderBlock[i] == TagsConstants.ReferenceAssignedByTheSenderTag)
                 {
-                    tagsList.Add(new Tag(ReferenceAssignedByTheSenderTag, ReferenceAssignedByTheSenderName, splittedTextHeaderBlock[i + 1].TrimEnd()));
-
+                    tags.ReferenceAssinedByTheSender = splittedTextHeaderBlock[i + 1].TrimEnd();
                 }
-                else if (splittedTextHeaderBlock[i] == MessageBodyTag)
+                if (splittedTextHeaderBlock[i] == TagsConstants.MessageBodyTag)
                 {
                     for (int j = i + 1; j < splittedTextHeaderBlock.Count; j++)
                     {
@@ -89,17 +68,17 @@ namespace SwiftMessageReader.Helpers
 
                     messageBody.TrimEnd();
 
-                    tagsList.Add(new Tag(MessageBodyTag, MessageBodyName, messageBody));
+                    tags.MessageBody = messageBody;
                 }
             }
 
-            transferData.BlocksList = blocksList;
-            transferData.TagsList = tagsList;
+            transferData.Blocks = blocks;
+            transferData.Tags = tags;
 
             return transferData;
         }
 
-        private static List<string> TextHeaderBlockSplitter(string text)
+        private static List<string> TextHeaderBlockSplitter(string text) // TODO: Extract to helper class.
         {
             var parts = text.Split(':').ToList();
 
@@ -133,18 +112,5 @@ namespace SwiftMessageReader.Helpers
 
             return resultList;
         }
-
-        private static void TagVerifier(string text)
-        {
-            var pattern = "^\\d\\:\\n?\\:\\d{2}\\:[0-9A-Z-]*\\s?\\n?:\\d{2}\\:[0-9A-Z-]*\\s?\\n?:\\d{2}\\:[\\x20-\\x2F\\x3A-\\x40A-Z0-9\\n]+[-]?$";
-            text = text.Replace("\r", "");
-            var isMatched = Regex.IsMatch(text, pattern);
-
-            if (!isMatched)
-            {
-                throw new Exception();
-            }
-        }
     }
 }
-

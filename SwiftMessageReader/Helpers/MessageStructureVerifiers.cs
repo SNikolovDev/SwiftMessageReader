@@ -1,4 +1,6 @@
-﻿using SwiftMessageReader.Exceptions;
+﻿using System.Text.RegularExpressions;
+
+using SwiftMessageReader.Exceptions;
 
 namespace SwiftMessageReader.Helpers
 {
@@ -34,6 +36,18 @@ namespace SwiftMessageReader.Helpers
             {
                 SwiftLogger.Error(Messages.WrongMessageStructure);
                 throw new WrongMessageStructureException(Messages.WrongMessageStructure);
+            }
+        }
+
+        public static void TagVerifier(string text)
+        {
+            var pattern = "^\\d\\:\\n?\\:\\d{2}\\:[0-9A-Z-]*\\s?\\n?:\\d{2}\\:[0-9A-Z-]*\\s?\\n?:\\d{2}\\:[\\x20-\\x2F\\x3A-\\x40A-Z0-9\\n]+[-]?$";
+            text = text.Replace("\r", "");
+            var isMatched = Regex.IsMatch(text, pattern);
+
+            if (!isMatched)
+            {
+                throw new Exception(); // TODO: Custom exception, logger;
             }
         }
     }

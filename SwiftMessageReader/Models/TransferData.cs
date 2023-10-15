@@ -2,8 +2,8 @@
 {
     public class TransferData
     {
-        public List<Block> BlocksList { get; set; }
+        public Blocks Blocks { get; set; }
 
-        public List<Tag> TagsList { get; set; }
+        public Tags Tags { get; set; }
     }
 }

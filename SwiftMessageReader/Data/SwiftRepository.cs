@@ -8,9 +8,10 @@ namespace SwiftMessageReader.Data
 {
     public class SwiftRepository : ISwiftRepository
     {
-
         private readonly IConfiguration configuration;
         private readonly string connectionString;
+
+        private static int msgSqNum = 0;
 
         public SwiftRepository(IConfiguration configuration)
         {
@@ -20,8 +21,8 @@ namespace SwiftMessageReader.Data
 
         public void InsertIntoDatabase(TransferData model)
         {
-            var blocks = model.BlocksList;
-            var tags = model.TagsList;
+            var blocks = model.Blocks;
+            var tags = model.Tags;
 
             using (var connection = new SQLiteConnection(connectionString))
             {
@@ -30,37 +31,48 @@ namespace SwiftMessageReader.Data
                 string insertIntoBlcokString = @"
                   INSERT INTO SwiftMessage(
                     CreatedOn,
-                    BlockNumber,
-                    BlockName,
-                    BlockData)
+                    SendersBankIdentifierCode,
+                    MessageReferenceNumber,
+                    MessageAuthenticationCode,
+                    CheckValue)
 
                   VALUES (
                     @CreatedOn,
-                    @BlockNumber,
-                    @BlockName,                  
-                    @BlockData)";
+                    @SendersBankIdentifierCode,
+                    @MessageReferenceNumber,
+                    @MessageAuthenticationCode,                  
+                    @CheckValue)";
 
                 string insertIntoTagsString = @"
                   INSERT INTO TagsInformationTable(
                     SwiftMessageId,
                     CreatedOn,
-                    TagNumber,
-                    TagName,
-                    TagData)
+                    TransactionReferenceNumberTag,
+                    TransactionReferenceNumber,
+                    ReferenceAssinedByTheSenderTag,
+                    ReferenceAssinedByTheSender,
+                    MessageBodyTag,
+                    MessageBody)
 
                    VALUES (
                      @SwiftMessageId,
                      @CreatedOn,
-                     @TagNumber,
-                     @TagName,
-                     @TagData)";
+                     @TransactionReferenceNumberTag,
+                     @TransactionReferenceNumber,
+                     @ReferenceAssinedByTheSenderTag,
+                     @ReferenceAssinedByTheSender,
+                     @MessageBodyTag,
+                     @MessageBody)";
 
-                var insretBlockCmd = new SQLiteCommand(insertIntoBlcokString, connection);
+                var insertBlockCmd = new SQLiteCommand(insertIntoBlcokString, connection);
                 var insertTagsCmd = new SQLiteCommand(insertIntoTagsString, connection);
 
-                AddBlockParamsWithValues(blocks, insretBlockCmd);
+                AddBlockParamsWithValues(blocks, insertBlockCmd);
                 int swiftMessageId = (int)connection.LastInsertRowId;
-                AddTagsParamsWithValues(tags, insertTagsCmd, swiftMessageId);
+                AddTagParamsWithValues(tags, insertTagsCmd, swiftMessageId);
+
+                insertBlockCmd.ExecuteNonQuery();
+                insertTagsCmd.ExecuteNonQuery();
 
                 SwiftLogger.Info(Messages.SuccessfulDataInsert);
 
@@ -68,34 +80,25 @@ namespace SwiftMessageReader.Data
             }
         }
 
-        private static void AddBlockParamsWithValues(List<Block> blocks, SQLiteCommand command)
+        private static void AddBlockParamsWithValues(Blocks blocks, SQLiteCommand command)
         {
-            foreach (var block in blocks)
-            {
-                command.Parameters.Clear();
-
-                command.Parameters.AddWithValue("@CreatedOn", block.CreatedOn);
-                command.Parameters.AddWithValue("@BlockNumber", block.BlockNumber);
-                command.Parameters.AddWithValue("@BlockName", block.BlockName);
-                command.Parameters.AddWithValue("@BlockData", block.BlockData);
-
-                command.ExecuteNonQuery();
-            }
+            command.Parameters.AddWithValue("@CreatedOn", blocks.CreatedOn);
+            command.Parameters.AddWithValue("@SendersBankIdentifierCode", blocks.SendersBankIdentifierCode);
+            command.Parameters.AddWithValue("@MessageReferenceNumber", blocks.MessageReferenceNumber);
+            command.Parameters.AddWithValue("@MessageAuthenticationCode", blocks.MessageAuthenticationCode);
+            command.Parameters.AddWithValue("@CheckValue", blocks.CheckValue);
         }
-        private static void AddTagsParamsWithValues(List<Tag> tags, SQLiteCommand command, int swiftMessageId)
+
+        private static void AddTagParamsWithValues(Tags tags, SQLiteCommand command, int swiftMessageId)
         {
-            foreach (var tag in tags)
-            {
-                command.Parameters.Clear();
-
-                command.Parameters.AddWithValue("@SwiftMessageId", swiftMessageId);
-                command.Parameters.AddWithValue("@CreatedOn", tag.CreatedOn);
-                command.Parameters.AddWithValue("@TagNumber", tag.TagNumber);
-                command.Parameters.AddWithValue("@TagName", tag.TagName);
-                command.Parameters.AddWithValue("@TagData", tag.TagData);
-
-                command.ExecuteNonQuery();
-            }
+            command.Parameters.AddWithValue("@SwiftMessageId", swiftMessageId);
+            command.Parameters.AddWithValue("@CreatedOn", tags.CreatedOn);
+            command.Parameters.AddWithValue("@TransactionReferenceNumberTag", tags.TransactionReferenceNumberTag);
+            command.Parameters.AddWithValue("@TransactionReferenceNumber", tags.TransactionReferenceNumber);
+            command.Parameters.AddWithValue("@ReferenceAssinedByTheSenderTag", tags.ReferenceAssinedByTheSenderTag);
+            command.Parameters.AddWithValue("@ReferenceAssinedByTheSender", tags.ReferenceAssinedByTheSender);
+            command.Parameters.AddWithValue("@MessageBodyTag", tags.MessageBodyTag);
+            command.Parameters.AddWithValue("@MessageBody", tags.MessageBody);
         }
     }
 }

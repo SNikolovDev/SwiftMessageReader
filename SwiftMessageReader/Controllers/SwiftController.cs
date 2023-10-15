@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
+using SwiftMessageReader.Exceptions;
 using SwiftMessageReader.Helpers;
 using SwiftMessageReader.Services.Interfaces;
 
@@ -18,7 +19,7 @@ namespace SwiftReader.Controllers
 
         [HttpPost("insert")]
         public IActionResult Insert(IFormFile file)
-        {// TODO: Add appropriate status codes.
+        {
             try
             {
                 service.ManageFile(file);
@@ -26,9 +27,16 @@ namespace SwiftReader.Controllers
                 SwiftLogger.Info(Messages.SuccessfulUpload);
                 return Ok();
             }
-            catch (Exception ex)
+            catch (InvalidFileException)
             {
-                SwiftLogger.Error(Messages.UploadFailedError + ex.Message);
+                return StatusCode(StatusCodes.Status400BadRequest);
+            }
+            catch (WrongBracketsSequence)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest);
+            }
+            catch (WrongMessageStructure)
+            {
                 return StatusCode(StatusCodes.Status400BadRequest);
             }
         }

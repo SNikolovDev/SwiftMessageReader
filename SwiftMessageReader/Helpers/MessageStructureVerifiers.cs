@@ -34,8 +34,8 @@ namespace SwiftMessageReader.Helpers
 
             if (isEven == false)
             {
-                SwiftLogger.Error(Messages.WrongMessageStructure);
-                throw new WrongMessageStructureException(Messages.WrongMessageStructure);
+                SwiftLogger.Error(Messages.WrongBracketsSequence);
+                throw new WrongBracketsSequence(Messages.WrongBracketsSequence);
             }
         }
 
@@ -47,7 +47,8 @@ namespace SwiftMessageReader.Helpers
 
             if (!isMatched)
             {
-                throw new Exception(); // TODO: Custom exception, logger;
+                SwiftLogger.Error(Messages.WrongMessageStructure);
+                throw new WrongMessageStructure(Messages.WrongMessageStructure);
             }
         }
     }

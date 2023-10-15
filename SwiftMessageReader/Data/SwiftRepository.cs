@@ -11,8 +11,6 @@ namespace SwiftMessageReader.Data
         private readonly IConfiguration configuration;
         private readonly string connectionString;
 
-        private static int msgSqNum = 0;
-
         public SwiftRepository(IConfiguration configuration)
         {
             this.configuration = configuration;
@@ -68,14 +66,14 @@ namespace SwiftMessageReader.Data
                 var insertTagsCmd = new SQLiteCommand(insertIntoTagsString, connection);
 
                 AddBlockParamsWithValues(blocks, insertBlockCmd);
-                int swiftMessageId = (int)connection.LastInsertRowId;
-                AddTagParamsWithValues(tags, insertTagsCmd, swiftMessageId);
-
                 insertBlockCmd.ExecuteNonQuery();
+
+                int swiftMessageId = (int)connection.LastInsertRowId;
+
+                AddTagParamsWithValues(tags, insertTagsCmd, swiftMessageId);
                 insertTagsCmd.ExecuteNonQuery();
 
                 SwiftLogger.Info(Messages.SuccessfulDataInsert);
-
                 connection.Close();
             }
         }

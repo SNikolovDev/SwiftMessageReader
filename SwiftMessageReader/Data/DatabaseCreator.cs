@@ -1,6 +1,5 @@
 ﻿using System.Data.SQLite;
 
-using SwiftMessageReader.Exceptions;
 using SwiftMessageReader.Helpers;
 
 namespace SwiftMessageReader.Data
@@ -61,20 +60,16 @@ namespace SwiftMessageReader.Data
                         ")",
                         connection);
 
-
                     command.ExecuteNonQuery();
                     secondCommand.ExecuteNonQuery();
 
                     SwiftLogger.Info(Messages.SuccessfulDatabaseCreation);
-
                     connection.Close();
                 }
-
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                SwiftLogger.Error(Messages.DatabaseCreateError + ex.Message);
-                throw new DatabaseCreationException(ex.Message);
+                SwiftLogger.Error(Messages.DatabaseCreateError);
             }
         }
     }

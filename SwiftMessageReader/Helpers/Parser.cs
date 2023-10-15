@@ -78,7 +78,7 @@ namespace SwiftMessageReader.Helpers
             return transferData;
         }
 
-        private static List<string> TextHeaderBlockSplitter(string text) // TODO: Extract to helper class.
+        private static List<string> TextHeaderBlockSplitter(string text)
         {
             var parts = text.Split(':').ToList();
 

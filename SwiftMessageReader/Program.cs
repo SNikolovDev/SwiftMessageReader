@@ -8,7 +8,7 @@ using SwiftMessageReader.Services.Interfaces;
 namespace SwiftMessageReader
 {
     public class Program
-    {
+    {// TODO: PUSH TO MAIN!
         public static void Main(string[] args)
         {
             var builder = WebApplication

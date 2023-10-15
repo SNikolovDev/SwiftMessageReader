@@ -1,6 +1,7 @@
 ﻿using SwiftMessageReader.Data.Interfaces;
 using SwiftMessageReader.Exceptions;
 using SwiftMessageReader.Helpers;
+using SwiftMessageReader.Models;
 using SwiftMessageReader.Services.Interfaces;
 
 namespace SwiftMessageReader.Services
@@ -16,24 +17,30 @@ namespace SwiftMessageReader.Services
 
         public void ManageFile(IFormFile file)
         {
-            var fileAsString = string.Empty;
-            // TODO: Throw an exception if false;
+            TransferData blocksAndTags;
+
             try
             {
-                // Exception thrown from TagVerifier!
-                fileAsString = FileToStringConverter.ConvertIFormFileToString(file);
+                string fileAsString = FileToStringConverter.ConvertIFormFileToString(file);
                 MessageStructureVerifiers.CurlyBracketsVerifier(fileAsString);
+                blocksAndTags = Parser.SplitByBlocksAndTags(fileAsString);
             }
-            catch (WrongMessageStructureException)
+            catch (InvalidFileException)
             {
-                throw new ArgumentException(Messages.WrongMessageStructure);
+                SwiftLogger.Error(Messages.InvalidFileExceptionMessage);
+                throw new InvalidFileException(Messages.InvalidFileExceptionMessage);
             }
-            catch (Exception ex)
+            catch (WrongBracketsSequence)
             {
-                throw new Exception(ex.Message); // TODO: Exception;
+                SwiftLogger.Error(Messages.WrongBracketsSequence);
+                throw new ArgumentException(Messages.WrongBracketsSequence);
+            }
+            catch (WrongMessageStructure)
+            {
+                SwiftLogger.Error(Messages.WrongMessageStructure);
+                throw new WrongMessageStructure(Messages.WrongMessageStructure);
             }
 
-            var blocksAndTags = Parser.SplitByBlocksAndTags(fileAsString);
             repository.InsertIntoDatabase(blocksAndTags);
         }
     }

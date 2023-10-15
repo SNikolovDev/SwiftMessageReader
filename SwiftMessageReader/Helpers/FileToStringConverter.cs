@@ -1,4 +1,5 @@
-﻿using SwiftMessageReader.Helpers;
+﻿using SwiftMessageReader.Exceptions;
+using SwiftMessageReader.Helpers;
 
 public class FileToStringConverter
 {
@@ -8,7 +9,7 @@ public class FileToStringConverter
         {
             if (file == null || file.Length == 0)
             {
-                throw new ArgumentNullException();
+                throw new InvalidFileException(Messages.InvalidFileExceptionMessage);
             }
 
             using (var memoryStream = new MemoryStream())
@@ -18,6 +19,7 @@ public class FileToStringConverter
 
                 using (var reader = new StreamReader(memoryStream, System.Text.Encoding.UTF8))
                 {
+                    SwiftLogger.Info(Messages.FileReadSuccessfuly);
                     return reader.ReadToEnd();
                 }
             }

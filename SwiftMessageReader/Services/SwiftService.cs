@@ -21,7 +21,7 @@ namespace SwiftMessageReader.Services
 
             try
             {
-                string fileAsString = FileToStringConverter.ConvertIFormFileToString(file);
+                var fileAsString = FileToStringConverter.ConvertIFormFileToString(file);
                 MessageStructureVerifiers.CurlyBracketsVerifier(fileAsString);
                 blocksAndTags = Parser.SplitByBlocksAndTags(fileAsString);
             }

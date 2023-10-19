@@ -25,7 +25,7 @@ namespace SwiftMessageReader.Data
                 }
 
                 SQLiteConnection.CreateFile(dbPath);
-                SwiftLogger.Info("Database created.");
+                SwiftLogger.Info(Messages.SuccessfulDatabaseCreation);
 
                 using (var connection = new SQLiteConnection(connectionString))
                 {

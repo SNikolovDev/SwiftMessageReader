@@ -2,7 +2,7 @@
 
 namespace SwiftMessageReader.Helpers
 {
-    public class Parser
+    public static class Parser
     {
         private const string MessageAuthenticationCodeАbbreviation = "MAC";
         private const string CheckValueAbbreviation = "CHK";

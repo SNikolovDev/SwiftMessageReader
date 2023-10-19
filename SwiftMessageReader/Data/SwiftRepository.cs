@@ -66,7 +66,7 @@ namespace SwiftMessageReader.Data
                 AddBlockParamsWithValues(blocks, insertBlockCmd);
                 insertBlockCmd.ExecuteNonQuery();
 
-                int swiftMessageId = (int)connection.LastInsertRowId;
+                var swiftMessageId = (int)connection.LastInsertRowId;
 
                 AddTagParamsWithValues(tags, insertTagsCmd, swiftMessageId);
                 insertTagsCmd.ExecuteNonQuery();
